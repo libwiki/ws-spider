@@ -1,8 +1,8 @@
 const crypto=require('crypto')
-const emitter = require('./emitter');
+const config=require('./setting')
+const emitter = require('./src/emitter');
 const fs=require('fs')
 const path=require('path')
-const config=require('../setting')
 
 module.exports={
 	// 获取模块

@@ -1,7 +1,7 @@
 const path=require('path')
 const pull=require('./pull')
 const task=require('./task')
-const util=require('./util')
+const util=require('../util')
 const config=require('../setting')
 
 module.exports={

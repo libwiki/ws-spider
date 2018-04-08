@@ -1,5 +1,5 @@
 const path=require('path')
-const util=require('./src/util')
+const util=require('./util')
 global.rootPath=path.resolve(__dirname)
 const controller=require('./src/controller')
 

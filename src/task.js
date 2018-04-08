@@ -1,6 +1,6 @@
 const events= require('events')
 const emitter=new events.EventEmitter();
-const util=require('./util')
+const util=require('../util')
 module.exports={
 	allUrl:new Set(), //url 去重
 	task:[], //待执行任务
