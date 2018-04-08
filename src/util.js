@@ -5,6 +5,25 @@ const path=require('path')
 const config=require('../setting')
 
 module.exports={
+	// 获取模块
+	getModule(name){
+		return new Promise((resolve,reject)=>{
+			if(!name)reject('The name parameters do not exist');
+			this.getModules().then(modules=>{
+				if(modules.indexOf(name)>=0){
+					let data={},
+						indexPath=path.resolve(config.appPath,name,config.entryFileName),
+						itemsPath=path.resolve(config.appPath,name,config.itemFileName);
+					data.dirname=path.resolve(config.appPath,name)
+					data.index=require(indexPath);
+					data.items=require(itemsPath);
+					resolve(data)
+				}
+			}).catch(err=>{
+				reject(err)
+			})
+		})
+	},
 	// 遍历获取所有模块名
 	getModules(){
 		return new Promise((resolve,reject)=>{
@@ -17,7 +36,7 @@ module.exports={
 			    res.forEach(item=>{
 					// 确保必须每个模块下必须存在入口文件
 			        let filepath=path.join(dirpath,item,config.entryFileName);
-					if(existsSync(filepath)){
+					if(fs.existsSync(filepath)){
 						modules.push(item);
 					}
 			    })
@@ -25,24 +44,29 @@ module.exports={
 			})
 		})
 	},
+	// md5 加密
 	md5(val){
 		let md5=crypto.creteHash('md5');
 		return md5.update(val).digest('hex')
 	},
+	// 事件注册
 	emit(event,data={}){
 		if(!event){
-			return 'Event parameters do not exist';
+			return 'The event parameters do not exist';
 		}
 		emitter.emit(event,data);
 	},
-	on(event,data={}){
-		return new Promise((resolve,reject)=>{
+	// 事件响应
+	on(event,callback){
+		if(typeof callback==='function'){
 			if(!event){
-				reject('Event parameters do not exist');
+				let err='The event parameters do not exist';
+				callback(err);
+				return;
 			}
 			emitter.on(event, data => {
-				resolve(data);
-		    })
-		})
+				callback(undefined,data);
+			})
+		}
 	}
 }

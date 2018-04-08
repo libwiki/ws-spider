@@ -87,7 +87,7 @@ module.exports={
 		this.tasked=[];
 		this.waitTask=[];
 		this.failTask=[];
-	}
+	},
 	// 任务列表是否为空
 	isEmpty(){
 		return this.task.length||this.waitTask.length;

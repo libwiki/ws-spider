@@ -4,9 +4,12 @@ module.exports={
 		'alipay.com'
 	],
 	*parse(rs){
-		let arr=rs.text;
+		let arr=this.baseUrl;
 		for(let item of arr){
 			yield item;
 		}
 	},
+	fun(){
+		console.log(this.baseUrl[1]);
+	}
 }
