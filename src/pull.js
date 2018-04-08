@@ -9,7 +9,8 @@ module.exports={
 		return new Promise((resolve,reject)=>{
 			let userAgent = userAgents[parseInt(Math.random() * userAgents.length)]
 			request(method,href).set(Object.assign({'User-Agent':userAgent},headers))
-			.timeout({response: 5000, deadline: 60000 }).charset(charset)
+			.timeout({response: 5000, deadline: 60000 })
+			.charset(charset)
 			.end((err,res)=>{
 				if(err)reject(err);
 				resolve(res);

@@ -1,5 +1,4 @@
-const events= require('events')
-const emitter=new events.EventEmitter();
+const config=require('../setting')
 const util=require('../util')
 module.exports={
 	allUrl:new Set(), //url 去重
@@ -8,28 +7,30 @@ module.exports={
 	tasked:[], // 已完成任务
 	waitTask:[], // 失败等待重试任务
 	failTask:[], // 失败任务
-	// {url,headers} 新任务添加
+	// {url,headers,method} 新任务添加
 	push(val){
 		if(val[0]){
 			val.forEach(item=>{
 				if(!this.allUrl.has(item.url)){
 					this.allUrl.add(item.url)
+					item._index=util.md5(item.url)
 					this.task.push(item)
-					emitter.emit('push',item)
+					util.emit(config.events.taskpush,item)
 				}
 			})
 		}else{
-			if(!this.allUrl.has(val)){
-				this.allUrl.add(val)
+			if(!this.allUrl.has(val.url)){
+				this.allUrl.add(val.url)
+				val._index=util.md5(val.url)
 				this.task.push(val)
-				emitter.emit('push',val)
+				util.emit(config.events.taskpush,val)
 			}
 		}
 
 	},
 	//获取执行任务
 	shift(length=1){
-		if(length<1||this.isEmpty()){
+		if(length<1||!this.hasTask()){
 			return;
 		}
 		let newTask=this.task.splice(0,length);
@@ -42,9 +43,6 @@ module.exports={
 				item._repeat=1;
 			}else{
 				item._repeat++;
-			}
-			if(!item._index){
-				item._index=util.md5(item.url)
 			}
 			this.tasking[item._index]=item;
 			return item;
@@ -73,7 +71,7 @@ module.exports={
 		}
 		val.forEach(item=>{
 			// 重复次数 应进行相应配置
-			if(item._repeat<3){
+			if(item._repeat<config.retryCount){
 				this.waitTask.push(item)
 			}else{
 				this.failTask.push(item)
@@ -88,8 +86,8 @@ module.exports={
 		this.waitTask=[];
 		this.failTask=[];
 	},
-	// 任务列表是否为空
-	isEmpty(){
+	// 任务列表是否存zai
+	hasTask(){
 		return this.task.length||this.waitTask.length;
 	}
 }

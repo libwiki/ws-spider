@@ -1,12 +1,10 @@
 const path=require('path')
+const {URL}=require('url')
 const util=require('./util')
-global.rootPath=path.resolve(__dirname)
+const config=require('./setting')
+const pull=require('./src/pull')
 const controller=require('./src/controller')
-
+let href='https://aa.github.com:888/bsspirit/async_demo/blob/master/each.js';
+let myurl=new URL(href);
+//console.log(myurl.host);
 controller.run('meituan')
-const events= require('events')
-const emitter=new events.EventEmitter();
-global.emitter=emitter
-emitter.on('pull',data=>{
-	console.log('task:',data)
-})

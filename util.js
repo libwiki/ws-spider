@@ -3,6 +3,7 @@ const config=require('./setting')
 const emitter = require('./src/emitter');
 const fs=require('fs')
 const path=require('path')
+const cheerio=require('cheerio')
 
 module.exports={
 	// 获取模块
@@ -44,9 +45,14 @@ module.exports={
 			})
 		})
 	},
+	parse(text){
+		if(text){
+			return cheerio.load(text);
+		}
+	},
 	// md5 加密
 	md5(val){
-		let md5=crypto.creteHash('md5');
+		let md5=crypto.createHash('md5');
 		return md5.update(val).digest('hex')
 	},
 	// 事件注册
@@ -60,12 +66,18 @@ module.exports={
 	on(event,callback){
 		if(typeof callback==='function'){
 			if(!event){
-				let err='The event parameters do not exist';
-				callback(err);
+				if(callback.length>1){
+					let err='The event parameters do not exist';
+					callback(err);
+				}
 				return;
 			}
 			emitter.on(event, data => {
-				callback(undefined,data);
+				if(callback.length>1){
+					callback(undefined,data);
+				}else{
+					callback(data);
+				}
 			})
 		}
 	}
