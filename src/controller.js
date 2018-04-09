@@ -2,11 +2,32 @@ const {URL}=require('url')
 const async=require('async')
 const pull=require('./pull')
 const task=require('./task')
-const util=require('../util')
-const config=require('../setting')
+const util=require('./util')
+const config=require('./setting')
 
-const controller={
-	cookie:{},
+class Controller{
+	constructor(){
+		this.cookie={}
+		
+		// cookie 更新
+		util.on(config.events.cookie,data=>{
+			if(!data||data.host||data.cookie){
+				return;
+			}
+			this.cookie[data.host]=data.cookie;
+		})
+
+		// 用户创建新的链接请求
+		util.on(config.events.newTask,(err,data)=>{
+			if(err){
+				util.emit('error',err)
+			}
+			if(!data||data.url||data.self){
+				return;
+			}
+			this._create(data.url,data.self,data.callbackName,data.options);
+		})
+	}
 	run(name){
 		if(!name)return;
 		util.getModule(name).then(modules=>{
@@ -39,7 +60,7 @@ const controller={
 		}).catch(err=>{
 			util.emit('error',err);
 		})
-	},
+	}
 	// 获取用户解析数据 生成items
 	_parse(self,data,callbackName,options){
 		if(!data)return;
@@ -52,7 +73,7 @@ const controller={
 			}
 		}
 		self[callbackName](self,data,options);
-	},
+	}
 	// 创建新的链接请求
 	_create(url,self,callbackName,options){
 		callbackName=callbackName||config.callbackName;
@@ -67,30 +88,13 @@ const controller={
 				})
 			}
 		}
-	},
+	}
 }
-// cookie 更新
-util.on(config.events.cookie,data=>{
-	if(!data||data.host||data.cookie){
-		return;
-	}
-	controller.cookie[data.host]=data.cookie;
-})
 
-// 用户创建新的链接请求
-util.on(config.events.newTask,(err,data)=>{
-	if(err){
-		util.emit('error',err)
-	}
-	if(!data||data.url||data.self){
-		return;
-	}
-	controller._create(data.url,data.self,data.callbackName,data.options);
-})
 // 所有错误监听
 util.on('error',err=>{
 	if(err&&config.debug){
 		console.log(err);
 	}
 })
-module.exports=controller
+module.exports=Controller

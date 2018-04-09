@@ -1,11 +1,16 @@
 const crypto=require('crypto')
 const config=require('./setting')
-const emitter = require('./src/emitter');
+const userAgents=require('./userAgents')
+const emitter = require('./emitter');
 const fs=require('fs')
 const path=require('path')
 const cheerio=require('cheerio')
 
-module.exports={
+class Util{
+	constructor(){
+		this.config=config
+		this.userAgents=userAgents
+	}
 	// 获取模块
 	getModule(name){
 		return new Promise((resolve,reject)=>{
@@ -24,7 +29,7 @@ module.exports={
 				reject(err)
 			})
 		})
-	},
+	}
 	// 遍历获取所有模块名
 	getModules(){
 		return new Promise((resolve,reject)=>{
@@ -44,24 +49,24 @@ module.exports={
 				resolve(modules);
 			})
 		})
-	},
+	}
 	parse(text){
 		if(text){
 			return cheerio.load(text);
 		}
-	},
+	}
 	// md5 加密
 	md5(val){
 		let md5=crypto.createHash('md5');
 		return md5.update(val).digest('hex')
-	},
+	}
 	// 事件注册
 	emit(event,data={}){
 		if(!event){
 			return 'The event parameters do not exist';
 		}
 		emitter.emit(event,data);
-	},
+	}
 	// 事件响应
 	on(event,callback){
 		if(typeof callback==='function'){
@@ -82,3 +87,4 @@ module.exports={
 		}
 	}
 }
+module.exports=new Util();

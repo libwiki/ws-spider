@@ -1,6 +1,6 @@
 const superagent=require('superagent')
 const request=require('superagent-charset')(superagent)
-const userAgents=require('../userAgents')
+const userAgents=require('./userAgents')
 const fs=require('fs')
 
 module.exports={

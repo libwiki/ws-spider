@@ -1,5 +1,5 @@
-const config=require('../setting')
-const util=require('../util')
+const config=require('./setting')
+const util=require('./util')
 module.exports={
 	allUrl:new Set(), //url 去重
 	task:[], //待执行任务
