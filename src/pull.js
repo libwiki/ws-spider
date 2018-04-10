@@ -1,13 +1,13 @@
 const superagent=require('superagent')
 const request=require('superagent-charset')(superagent)
-const userAgents=require('./userAgents')
+const util=require('./util')
 const fs=require('fs')
 
 module.exports={
 	// 远程请求
 	entry(href,headers={},method='get',charset='utf-8'){
 		return new Promise((resolve,reject)=>{
-			let userAgent = userAgents[parseInt(Math.random() * userAgents.length)]
+			let userAgent = util.userAgents[parseInt(Math.random() * util.userAgents.length)]
 			request(method,href).set(Object.assign({'User-Agent':userAgent},headers))
 			.timeout({response: 5000, deadline: 60000 })
 			.charset(charset)

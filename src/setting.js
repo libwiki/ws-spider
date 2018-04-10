@@ -1,5 +1,7 @@
+const path=require('path')
 module.exports={
-	entryFileName:"index.js", // 入口文件 默认名称
+	appPath:path.resolve(__dirname,'../app/test'),
+	entryFunction:"run", // 入口函数名
 	itemFileName:"items.js", // items 默认文件名称
 	callbackName:'parse', // 默认入口方法
 	limit:1, // 并发量
