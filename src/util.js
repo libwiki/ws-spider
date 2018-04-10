@@ -2,6 +2,7 @@ const crypto=require('crypto')
 const fs=require('fs')
 const {URL}=require('url')
 const path=require('path')
+const async=require('async')
 const config=require('./setting')
 const userAgents=require('./userAgents')
 const emitter = require('./emitter');
@@ -26,7 +27,7 @@ class Util{
 					// 这里执行每个模块的爬取
 					let Item=require(path.join(appPath,item)),
 						m=new Item();
-					_this[_fetch](m,item,_this);
+					_this[_fetch](m,_this);
 					callback();
 				},err=>{
 					if(err){
@@ -35,9 +36,9 @@ class Util{
 				})
 			})
 		}else if(typeof val==='string'){
-			const _this=this,
+			const _this=this;
 			_this.getModule(val).then(m=>{
-
+				_this[_fetch](m,_this);
 			})
 		}
 	}
@@ -59,7 +60,6 @@ class Util{
 	getModules(){
 		return new Promise((resolve,reject)=>{
 			let dirpath=this.config.appPath;
-			console.log(dirpath);
 			fs.readdir(dirpath,(err,res)=>{
 			    if(err){
 			        reject(err);
@@ -109,6 +109,11 @@ class Util{
 			})
 		}
 	}
+	// 合并用户配置
+	setting(config={},userAgents={}){
+		this.config=Object.assign(this.config,config)
+		this.userAgents=Object.assign(this.userAgents,userAgents)
+	}
 	// 初始化
 	[_init](){
 		// 所有错误监听
@@ -118,7 +123,7 @@ class Util{
 			}
 		})
 		// cookie 更新
-		this.on(this.config.events.cookie,data=>{
+		this.on(this.config.events.updateCookie,data=>{
 			if(!data||data.host||data.cookie){
 				return;
 			}
@@ -127,8 +132,18 @@ class Util{
 
 	}
 	// 执行解析器
-	[_fetch](m,item,_this){
+	[_fetch](m,_this){
 		_this=_this||this;
+		let baseUrlName=_this.config.baseUrlName;
+		if(m[baseUrlName]&&m[baseUrlName].length){
+			let data={
+				url:m[baseUrlName],
+			}
+			this.emit(_this.config.events.newTask,data);
+		}else{
+			this.emit('error',`请先设置起始链接：`.baseUrlName);
+			return;
+		}
 		if(typeof m[entryFunction] ==='function'){
 			let newTask=task.shift(_this.config.limit);
 			if(newTask){

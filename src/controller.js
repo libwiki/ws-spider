@@ -1,5 +1,3 @@
-const async=require('async')
-const {URL}=require('url')
 const util=require('./util')
 const task=require('./task')
 
@@ -7,7 +5,6 @@ const _parse=Symbol('_parse')
 const _init=Symbol('_init')
 class Controller{
     constructor(){
-        this.cookie={}
         this[_init]()
     }
 
@@ -29,12 +26,12 @@ class Controller{
     // 获取用户解析数据 生成items
 	[_parse](self,data,callbackName,options){
 		if(!data)return;
-		callbackName=callbackName||util.config.callbackName;
+		callbackName=callbackName||util.config.entryName;
 		if(data.header&&data.request){
 			let cookie=data.header['set-cookie'],
 				host=data.request['host'];
 			if(cookie&&host){
-				util.emit(util.config.events.cookie,{host,cookie})
+				util.emit(util.config.events.updateCookie,{host,cookie})
 			}
 		}
 		self[callbackName](self,data,options);

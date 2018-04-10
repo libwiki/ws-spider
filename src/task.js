@@ -14,7 +14,7 @@ module.exports={
 					this.allUrl.add(item.url)
 					item._index=util.md5(item.url)
 					this.task.push(item)
-					util.emit(util.config.events.taskpush,item)
+					util.emit(util.config.events.taskPush,item)
 				}
 			})
 		}else{
@@ -22,7 +22,7 @@ module.exports={
 				this.allUrl.add(val.url)
 				val._index=util.md5(val.url)
 				this.task.push(val)
-				util.emit(util.config.events.taskpush,val)
+				util.emit(util.config.events.taskPush,val)
 			}
 		}
 

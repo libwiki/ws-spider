@@ -18,13 +18,6 @@ class Tests extends Test{
         this.test(__filename)
     }
 }
-new Tests();
-let arr=[1,2,3,4,5,6,7,8,9,10];
-async.eachLimit(arr,2,(item,callback)=>{
-    setTimeout(function(){
-        console.log(item);
-    },1000)
-    callback();
-},err=>{
-    if(err)console.log('err:',err);
-})
+let a={a:1,b:2}
+let b={a:2,c:1}
+console.log(Object.assign(a,b));

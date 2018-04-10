@@ -1,18 +1,17 @@
 const path=require('path')
 module.exports={
 	appPath:path.resolve(__dirname,'../app/test'),
-	entryFunction:"run", // 入口函数名
-	itemFileName:"items.js", // items 默认文件名称
-	callbackName:'parse', // 默认入口方法
+	entryName:"parse", // 默认入口方法名称
+	baseUrlName:"baseUrl", // 起始链接 变量名称
 	limit:1, // 并发量
 	debug:true,
 	retryCount:3, // 重试次数
 	method:'get',
 	charset:'utf-8',
 	events:{
-		items:'ws-items', // items数据事件
-		taskpush:'ws-tash-push', // 新增task事件
-		cookie:'ws-cookie', // cookie 更新
+		taskPush:'ws-tash-push', // 新增task事件
+		updateCookie:'ws-cookie', // cookie 更新
 		newTask:'ws-new-task', // 用户创建新任务 事件
+		parseData:'ws-parse-data',// 数据返回解析cookie事件
 	}
 }

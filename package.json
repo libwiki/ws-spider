@@ -1,13 +1,20 @@
 {
   "name": "ws-spider",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "ws-spider、crawler",
+  "keywords":["spider","crawler","node","javascript"],
+  "homepage":"",
+  "repository":{
+    "type":"git",
+    "url":"https://github.com/wschat/ws-spider"
+  },
+  "main": "main.js",
+  "bin":"",
   "scripts": {
     "dev": "node app.js"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "async": "^2.6.0",
     "cheerio": "^1.0.0-rc.2",

@@ -1,15 +1,10 @@
-const Controller=require('./src/Controller')
-class Meituan extends Controller{
-    constructor(){
-
-    }
-    parse(){
-        this.create('baidu.com',this,orther)
-    }
-    orther(){
-
-    }
-    run(){
-        this.create('baidu.com',this)
+const util=require('./src/util')
+const Controller=require('./src/controller')
+class WsSpider{
+    constructor(config={},userAgents={}){
+        util.setting(config,userAgents)
+        this.util=util
+        this.Controller=Controller
     }
 }
+module.exports=WsSpider
