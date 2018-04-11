@@ -30,7 +30,7 @@ module.exports={
 	//获取执行任务
 	shift(length=1){
 		if(length<1||!this.hasTask()){
-			return;
+			return [];
 		}
 		let newTask=this.task.splice(0,length);
 		let less=length-newTask;
@@ -49,7 +49,7 @@ module.exports={
 		return newTask;
 	},
 	// 任务完成
-	endTask(index,type=true){
+	finish(index,type=true){
 		if(!index){
 			return;
 		}

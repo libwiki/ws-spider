@@ -2,7 +2,7 @@ module.exports={
 	appPath:'',
 	entryName:"parse", // 默认入口方法名称
 	baseUrlName:"baseUrl", // 起始链接 变量名称
-	limit:1, // 并发量
+	limit:3, // 并发量
 	debug:true,
 	retryCount:3, // 重试次数
 	method:'get',

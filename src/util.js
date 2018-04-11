@@ -150,7 +150,13 @@ class Util{
 		// 所有错误监听
 		this.on('error',err=>{
 			if(err&&this.config.debug){
-				console.log('监听到的错误:',err);
+				console.log('错误监听:',err);
+			}
+		})
+		// 任务完成监听
+		this.on('end',_=>{
+			if(this.config.debug){
+				console.log('任务完成...');
 			}
 		})
 	}
