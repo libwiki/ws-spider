@@ -83,6 +83,34 @@ class Util{
 		let md5=crypto.createHash('md5');
 		return md5.update(val).digest('hex')
 	}
+	// 深拷贝
+	clone(data){
+		let obj,
+			type=null,
+			_this=this,
+			map = {
+	          	'[object Array]':'array',
+	          	'[object Object]':'object'
+	      	};
+      	if(typeof data==='object'){
+      		type = Object.prototype.toString.call(data);
+      		type=map[type];
+      	}else{
+      		type=typeof data;
+      	}
+       	if(type === 'array'){
+           obj = [];
+       	} else if(type === 'object'){
+           obj = {};
+       	} else {
+           //不再具有下一层次
+           return data;
+       	}
+       	for(let key in data){
+           obj[key] = _this.clone(data[key]);
+       	}
+       	return obj;
+   	}
 	// 事件注册
 	emit(event,data={}){
 		if(!event){

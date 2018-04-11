@@ -7,7 +7,6 @@ class Meituan extends Controller{
     }
     parse(self,res,extraData){
         let $=cheerio.load(res.text)
-        let data=[];
         $('#search-header-placeholder .city-wrapper .classify-content div:not(.hot-content) .classify-row').each((i,row)=>{
 			let prefix=$(row).children('em').text().toUpperCase();
 			$(row).find('a').each((index,a)=>{
