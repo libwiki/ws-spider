@@ -1,6 +1,5 @@
-const path=require('path')
 module.exports={
-	appPath:path.resolve(__dirname,'../app/test'),
+	appPath:'',
 	entryName:"parse", // 默认入口方法名称
 	baseUrlName:"baseUrl", // 起始链接 变量名称
 	limit:1, // 并发量
@@ -13,5 +12,6 @@ module.exports={
 		updateCookie:'ws-cookie', // cookie 更新
 		newTask:'ws-new-task', // 用户创建新任务 事件
 		parseData:'ws-parse-data',// 数据返回解析cookie事件
+		_fetch:'ws-event-fetch', // 解析
 	}
 }

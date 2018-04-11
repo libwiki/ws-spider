@@ -1,18 +1,14 @@
 const crypto=require('crypto')
 const fs=require('fs')
-const {URL}=require('url')
 const path=require('path')
 const async=require('async')
 const config=require('./setting')
 const userAgents=require('./userAgents')
 const emitter = require('./emitter');
 
-
 const _init=Symbol('_init')
-const _fetch=Symbol('_fetch')
 class Util{
 	constructor(){
-		this.cookie={}
 		this.config=config
 		this.userAgents=userAgents
 		this[_init]();
@@ -20,25 +16,29 @@ class Util{
 	run(val=1){
 		if(typeof val==='number'){
 			const _this=this,
-				entryFunction=_this.config.entryFunction,
+				entryName=_this.config.entryName,
 				appPath=_this.config.appPath;
 			_this.getModules().then(modules=>{
 				async.eachLimit(modules,val,(item,callback)=>{
 					// 这里执行每个模块的爬取
 					let Item=require(path.join(appPath,item)),
 						m=new Item();
-					_this[_fetch](m,_this);
+					_this.emit(_this.config.events._fetch,m)
 					callback();
 				},err=>{
 					if(err){
 						this.emit('error',err);
 					}
 				})
+			}).catch(err=>{
+				if(err)_this.emit('error',err);
 			})
 		}else if(typeof val==='string'){
 			const _this=this;
 			_this.getModule(val).then(m=>{
-				_this[_fetch](m,_this);
+				_this.emit(_this.config.events._fetch,m)
+			}).catch(err=>{
+				if(err)_this.emit('error',err);
 			})
 		}
 	}
@@ -52,7 +52,7 @@ class Util{
 					resolve(require(modulePath))
 				}
 			}).catch(err=>{
-				reject(err)
+				if(err)reject(err);
 			})
 		})
 	}
@@ -111,6 +111,9 @@ class Util{
 	}
 	// 合并用户配置
 	setting(config={},userAgents={}){
+		if(config.events){
+            delete config.events
+        }
 		this.config=Object.assign(this.config,config)
 		this.userAgents=Object.assign(this.userAgents,userAgents)
 	}
@@ -119,60 +122,9 @@ class Util{
 		// 所有错误监听
 		this.on('error',err=>{
 			if(err&&this.config.debug){
-				console.log(err);
+				console.log('监听到的错误:',err);
 			}
 		})
-		// cookie 更新
-		this.on(this.config.events.updateCookie,data=>{
-			if(!data||data.host||data.cookie){
-				return;
-			}
-			this.cookie[data.host]=data.cookie;
-		})
-
-	}
-	// 执行解析器
-	[_fetch](m,_this){
-		_this=_this||this;
-		let baseUrlName=_this.config.baseUrlName;
-		if(m[baseUrlName]&&m[baseUrlName].length){
-			let data={
-				url:m[baseUrlName],
-			}
-			this.emit(_this.config.events.newTask,data);
-		}else{
-			this.emit('error',`请先设置起始链接：`.baseUrlName);
-			return;
-		}
-		if(typeof m[entryFunction] ==='function'){
-			let newTask=task.shift(_this.config.limit);
-			if(newTask){
-				async.each(newTask,(item,callback)=>{
-					let headers=item.headers||{},
-						method=item.method||_this.config.method,
-						charset=item.charset||_this.config.charset,
-						myurl=new URL(item.url);
-					let Cookie=_this.cookie[myurl.host]||'';
-					headers=Object(headers,{Cookie})
-					pull.entry(item.url,headers,method,charset).then(rs=>{
-						let data={
-							self:item.self,
-							data:rs,
-							callbackName:item.callbackName,
-							options:item.options
-						}
-						_this.emit(_this.config.events.parseData,data)
-					}).catch(err=>{
-						if(err)_this.emit('error',err)
-					})
-					callback();
-				},err=>{
-					if(err)_this.emit('error',err);
-				})
-			}
-		}else{
-			this.emit('error',`模块${item}上不存在入口方法${entryFunction}`)
-		}
 	}
 
 }
