@@ -9,10 +9,10 @@ module.exports={
 		return new Promise((resolve,reject)=>{
 			let userAgent = util.userAgents[parseInt(Math.random() * util.userAgents.length)]
 			request(method,href).set(Object.assign({'User-Agent':userAgent},headers))
-			.timeout({response: 5000, deadline: 60000 })
+			.timeout({response: 3000, deadline: 60000 })
 			.charset(charset)
 			.end((err,res)=>{
-				if(err)reject(err);
+				if(err)reject('请求超时：'+href);
 				resolve(res);
 			})
 		})

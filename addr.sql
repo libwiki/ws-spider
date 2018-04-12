@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : localhost
+Source Server         : 127.0.0.1
 Source Server Version : 50553
-Source Host           : localhost:3306
+Source Host           : 127.0.0.1:3306
 Source Database       : addr
 
 Target Server Type    : MYSQL
 Target Server Version : 50553
 File Encoding         : 65001
 
-Date: 2018-04-12 17:43:45
+Date: 2018-04-12 23:27:12
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -24,7 +24,7 @@ CREATE TABLE `t_area` (
   `name` varchar(50) DEFAULT NULL COMMENT '区域、分类名称标签',
   `status` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2218 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for t_area_classify
@@ -46,7 +46,7 @@ CREATE TABLE `t_city` (
   `status` tinyint(1) DEFAULT '1' COMMENT '状态',
   `href` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=202 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for t_classify
@@ -57,7 +57,7 @@ CREATE TABLE `t_classify` (
   `name` varchar(20) DEFAULT NULL COMMENT '区域分类名称',
   `status` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for t_hotel
@@ -72,7 +72,17 @@ CREATE TABLE `t_hotel` (
   `address` varchar(200) DEFAULT NULL COMMENT '详细的地址（该地址可转换为经纬度）',
   `l_and_l` varchar(255) DEFAULT NULL COMMENT '经纬度',
   `locations_id` int(11) DEFAULT '0' COMMENT '所属地址ID 来源表：locations（通常指该酒店所在更大一些的区域，比如某个广场、某条路）',
+  `city_id` int(11) DEFAULT '0' COMMENT '所属城市ID 来源表：city',
   PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_hotel_area
+-- ----------------------------
+DROP TABLE IF EXISTS `t_hotel_area`;
+CREATE TABLE `t_hotel_area` (
+  `hotel_id` int(11) DEFAULT NULL COMMENT '酒店ID 来源表：hotel',
+  `area_id` int(11) DEFAULT NULL COMMENT '城市ID 来源表：area'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------
@@ -85,7 +95,7 @@ CREATE TABLE `t_locations` (
   `status` tinyint(1) DEFAULT '1',
   `href` varchar(200) DEFAULT NULL COMMENT '链接地址',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1798 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for t_locations_area
