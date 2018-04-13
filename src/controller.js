@@ -89,33 +89,37 @@ class Controller{
         if(!_this.running&&_this.tisking.length){
             _this.running=true;
             let newTask=_this.tisking.splice(0,length);
-            async.map(newTask,(item,callback)=>{
-                let headers=item.headers||{},
-                    method=item.method||util.config.method,
-                    charset=item.charset||util.config.charset,
-                    myurl=new URL(item.url);
-                let Cookie=_this.cookie[myurl.host]||'';
-                headers=Object(headers,{Cookie})
-                pull.entry(item.url,headers,method,charset).then(rs=>{
-                    let data={
-                        self:item.self,
-                        res:rs,
-                        callbackName:item.callbackName,
-                        data:item.data
-                    }
-                    util.emit(util.config.events.parseData,data)
-                    // 每完成一个任务则继续补加任务
-                    _this[_runTask](false);
-                    // 该任务完成
-                    task.finish(item._index)
-                    callback(null,'results');
-                }).catch(err=>{
-                    if(err){
-                        util.emit('error',err);
-                        // 本次任务失败 重试
-                        task.setWaitTask(item)
-                    }
-                })
+            let maxDelay=util.config.delay;
+            async.mapLimit(newTask,length,(item,callback)=>{
+                let delay = parseInt((Math.random() * 10000000) % maxDelay, 10);
+                setTimeout(function () {
+                    let headers=item.headers||{},
+                        method=item.method||util.config.method,
+                        charset=item.charset||util.config.charset,
+                        myurl=new URL(item.url);
+                    let Cookie=_this.cookie[myurl.host]||'';
+                    headers=Object(headers,{Cookie})
+                    pull.entry(item.url,headers,method,charset).then(rs=>{
+                        let data={
+                            self:item.self,
+                            res:rs,
+                            callbackName:item.callbackName,
+                            data:item.data
+                        }
+                        util.emit(util.config.events.parseData,data)
+                        // 每完成一个任务则继续补加任务
+                        _this[_runTask](false);
+                        // 该任务完成
+                        task.finish(item._index)
+                        callback(null,'results');
+                    }).catch(err=>{
+                        if(err){
+                            util.emit('error',err);
+                            // 本次任务失败 重试
+                            task.setWaitTask(item)
+                        }
+                    })
+                },delay);
             },(err,results)=>{
                 if(err)util.emit('error',err);
                 // 分段完成（任务流）
