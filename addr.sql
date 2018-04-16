@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : 127.0.0.1
+Source Server         : localhost
 Source Server Version : 50553
-Source Host           : 127.0.0.1:3306
+Source Host           : localhost:3306
 Source Database       : addr
 
 Target Server Type    : MYSQL
 Target Server Version : 50553
 File Encoding         : 65001
 
-Date: 2018-04-12 23:27:12
+Date: 2018-04-13 08:50:16
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -27,6 +27,10 @@ CREATE TABLE `t_area` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------
+-- Records of t_area
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for t_area_classify
 -- ----------------------------
 DROP TABLE IF EXISTS `t_area_classify`;
@@ -34,6 +38,10 @@ CREATE TABLE `t_area_classify` (
   `classify_id` int(11) DEFAULT '0' COMMENT '每一个区域的统计分类ID 来源表：classify',
   `area_id` int(11) DEFAULT '0' COMMENT '城市区域ID 来源表：area'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of t_area_classify
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for t_city
@@ -49,6 +57,10 @@ CREATE TABLE `t_city` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------
+-- Records of t_city
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for t_classify
 -- ----------------------------
 DROP TABLE IF EXISTS `t_classify`;
@@ -57,7 +69,18 @@ CREATE TABLE `t_classify` (
   `name` varchar(20) DEFAULT NULL COMMENT '区域分类名称',
   `status` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of t_classify
+-- ----------------------------
+INSERT INTO `t_classify` VALUES ('1', '热门', '1');
+INSERT INTO `t_classify` VALUES ('2', '行政区/商圈', '1');
+INSERT INTO `t_classify` VALUES ('3', '地铁站', '1');
+INSERT INTO `t_classify` VALUES ('4', '高校', '1');
+INSERT INTO `t_classify` VALUES ('5', '车站/机场', '1');
+INSERT INTO `t_classify` VALUES ('6', '旅游景点', '1');
+INSERT INTO `t_classify` VALUES ('7', '医院', '1');
 
 -- ----------------------------
 -- Table structure for t_hotel
@@ -77,6 +100,10 @@ CREATE TABLE `t_hotel` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------
+-- Records of t_hotel
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for t_hotel_area
 -- ----------------------------
 DROP TABLE IF EXISTS `t_hotel_area`;
@@ -84,6 +111,10 @@ CREATE TABLE `t_hotel_area` (
   `hotel_id` int(11) DEFAULT NULL COMMENT '酒店ID 来源表：hotel',
   `area_id` int(11) DEFAULT NULL COMMENT '城市ID 来源表：area'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of t_hotel_area
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for t_locations
@@ -98,6 +129,10 @@ CREATE TABLE `t_locations` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------
+-- Records of t_locations
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for t_locations_area
 -- ----------------------------
 DROP TABLE IF EXISTS `t_locations_area`;
@@ -105,3 +140,7 @@ CREATE TABLE `t_locations_area` (
   `locations_id` int(11) DEFAULT '0' COMMENT '地区id 来源表：locations',
   `area_id` int(11) DEFAULT '0' COMMENT '城市区域ID 来源表：area'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of t_locations_area
+-- ----------------------------
