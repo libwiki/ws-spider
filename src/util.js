@@ -11,9 +11,14 @@ class Util{
 	constructor(){
 		this.config=config
 		this.userAgents=userAgents
+		this.startTime=0;
 		this[_init]();
 	}
 	run(val=1){
+		if(this.startTime===0){
+			this.emit('start'); //开始执行钩子
+			this.startTime=new Date().getTime();
+		}
 		if(typeof val==='number'){
 			const _this=this,
 				entryName=_this.config.entryName,
@@ -150,14 +155,24 @@ class Util{
 		// 所有错误监听
 		this.on('error',err=>{
 			if(err&&this.config.debug){
-				console.log('错误监听:',err);
+				console.log('错误:',err);
 			}
 		})
 		// 任务完成监听
-		this.on('end',_=>{
-			if(this.config.debug){
-				console.log('任务完成...');
-			}
+		this.on('start',data=>{
+			console.log('开始执行...');
+		})
+		// 每一次爬取请求 触发的钩子 可以给用户一些交互反馈
+		this.on('send',item=>{
+			//console.log(item.url);
+		})
+		// 任务完成监听
+		this.on('end',data=>{
+			let duration=new Date().getTime()-this.startTime;
+			console.log('任务完成...');
+			console.log('总任务数：'+data.total);
+			console.log('失败任务数：'+data.failTask.length);
+			console.log('总耗时(ms)：'+duration);
 		})
 	}
 

@@ -61,9 +61,6 @@ class Model{
     }
     [_init](){
         let _this=this;
-        util.on('ws-connect-orm2',_=>{
-            _this[_runQueue]();
-        })
         orm.connect('mysql://root:root@127.0.0.1/addr?pool=true', function(err, db) {
     		if(err)util.emit('error',err);
     		//db.settings.set('instance.returnAllErrors', true);
@@ -71,7 +68,9 @@ class Model{
                 require(models[key])(orm,db,key);
             }
     		_this.connection=db;
-            util.emit('ws-connect-orm2')
+            process.nextTick(function(){
+                _this[_runQueue]();
+            })
     	});
     }
 }

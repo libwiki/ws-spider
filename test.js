@@ -4,12 +4,13 @@ const model1=require('./model')
 
 
 model.db(db=>{
-    city=db.models['t_city']
-    city.get(103,(err,rs)=>{
-        console.log(rs.name);
-    })
+    // city=db.models['t_city']
+    // city.get(103,(err,rs)=>{
+    //     console.log(rs.name);
+    // })
 })
 model.db('area',db=>{
+    console.log(123);
     db.get(142,(err,rs)=>{
         console.log(rs.name);
     })

@@ -11,9 +11,10 @@ const _runTask=Symbol('_runTask')
 class Controller{
     constructor(){
         this.cookie={}
-        this.tisking=[]
+        this.tasking=[]
         this.running=false
         this[_init]()
+        this.count=0;
     }
     // 创建新的链接请求
     // options={callbackName,data,headers,method,charset}
@@ -79,47 +80,52 @@ class Controller{
         let _this=this,
             length=util.config.limit,
             limit=isFirst?length*2:1;
-        if(this.tisking.length>=length){
+        if(this.tasking.length>=length){
             return;
         }
         let _task=task.shift(limit)
         _task.forEach(item=>{
-            _this.tisking.push(item);
+            _this.tasking.push(item);
         })
-        if(!_this.running&&_this.tisking.length){
+        if(!_this.running&&_this.tasking.length){
             _this.running=true;
-            let newTask=_this.tisking.splice(0,length);
-            async.map(newTask,(item,callback)=>{
+            let newTask=_this.tasking.splice(0,length);
+            async.mapLimit(newTask,length,(item,callback)=>{
                 let headers=item.headers||{},
                     method=item.method||util.config.method,
                     charset=item.charset||util.config.charset,
                     myurl=new URL(item.url);
                 let Cookie=_this.cookie[myurl.host]||'';
+                console.log('cookie:',Cookie);
+
                 headers=Object(headers,{Cookie})
-                pull.entry(item.url,headers,method,charset).then(rs=>{
-                    let data={
-                        self:item.self,
-                        res:rs,
-                        callbackName:item.callbackName,
-                        data:item.data
-                    }
-                    util.emit(util.config.events.parseData,data)
-                    // 每完成一个任务则继续补加任务
-                    _this[_runTask](false);
-                    // 该任务完成
-                    task.finish(item._index)
-                    callback(null,'results');
-                }).catch(err=>{
-                    if(err){
-                        util.emit('error',err);
-                        // 本次任务失败 重试
-                        task.setWaitTask(item)
-                    }
-                })
+                setTimeout(_=>{
+                    util.emit('send',item); // 每次发送请求钩子
+                    pull.entry(item.url,headers,method,charset).then(rs=>{
+                        let data={
+                            self:item.self,
+                            res:rs,
+                            callbackName:item.callbackName,
+                            data:item.data
+                        }
+                        util.emit(util.config.events.parseData,data)
+                        // 每完成一个任务则继续补加任务
+                        _this[_runTask](false);
+                        // 该任务完成
+                        task.finish(item._index)
+                        callback(null,'results');
+                    }).catch(err=>{
+                        if(err){
+                            if(!err.timeout){ //仅捕获非超时错误
+                                util.emit('error',err);
+                            }
+                            // 本次任务失败 重试
+                            task.setWaitTask(item)
+                        }
+                    })
+                },util.config.speed)
             },(err,results)=>{
                 if(err)util.emit('error',err);
-                // 分段完成（任务流）
-                util.emit('data');
             })
         }else{
             _this.running=false;
@@ -152,7 +158,7 @@ class Controller{
 		})
         // cookie 更新
 		util.on(util.config.events.updateCookie,data=>{
-			if(!data||data.host||data.cookie){
+			if(!data||!data.host||!data.cookie){
 				return;
 			}
 			this.cookie[data.host]=data.cookie;

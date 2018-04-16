@@ -4,6 +4,8 @@ module.exports={
 	baseUrlName:"baseUrl", // 起始链接 变量名称
 	limit:3, // 并发量
 	debug:true,
+	timeout:3000, //超时 单位：ms
+	speed:1000, // 限速 单位：ms
 	retryCount:3, // 重试次数
 	method:'get',
 	charset:'utf-8',

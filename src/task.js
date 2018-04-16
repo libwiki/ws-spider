@@ -1,11 +1,24 @@
 const util=require('./util')
-module.exports={
-	allUrl:new Set(), //url 去重
-	task:[], //待执行任务
-	tasking:{}, // 正在执行的任务
-	tasked:[], // 已完成任务
-	waitTask:[], // 失败等待重试任务
-	failTask:[], // 失败任务
+
+const _isEnd=Symbol('_isEnd')
+const _init=Symbol('_init')
+
+class Task{
+	constructor(){
+		this.reload();
+		this[_init]();
+	}
+	reload(){
+		this.allUrl=new Set() //url 去重
+		this.task=[] //待执行任务
+		this.tasking={} // 正在执行的任务
+		this.tasked=[] // 已完成任务
+		this.waitTask=[] // 失败等待重试任务
+		this.failTask=[] // 失败任务
+		this.timer=null
+		this.pushCount=0
+		this.shiftCount=0
+	}
 	// {url,headers,method} 新任务添加
 	push(val){
 		if(val[0]){
@@ -26,18 +39,21 @@ module.exports={
 			}
 		}
 
-	},
+	}
 	//获取执行任务
 	shift(length=1){
 		if(length<1||!this.hasTask()){
 			return [];
 		}
 		let newTask=this.task.splice(0,length);
-		let less=length-newTask;
-		if(less){
-			newTask.push(this.waitTask.splice(0,less))
+		let l=newTask.length;
+		let less=length-l;
+		this.shiftCount+=l;
+		if(less>0){
+			let waitTask=this.waitTask.splice(0,less);
+			newTask.push(...waitTask);
 		}
-		newTask.map(item=>{
+		newTask=newTask.map(item=>{
 			if(typeof item._repeat==='undefined'){
 				item._repeat=1;
 			}else{
@@ -47,7 +63,7 @@ module.exports={
 			return item;
 		})
 		return newTask;
-	},
+	}
 	// 任务完成
 	finish(index,type=true){
 		if(!index){
@@ -62,31 +78,55 @@ module.exports={
 			}
 			delete this.tasking[index];
 		}
-	},
+	}
 	// 任务失败设置等待任务
-	setWaitTask(val=[]){
-		if(!val||!val.length){
+	setWaitTask(item=null){
+		if(!item){
 			return;
 		}
-		val.forEach(item=>{
-			// 重复次数 应进行相应配置
-			if(item._repeat<util.config.retryCount){
-				this.waitTask.push(item)
-			}else{
-				this.failTask.push(item)
-			}
-		})
-	},
-	reload(){
-		this.allUrl=new Set();
-		this.task=[];
-		this.tasking={};
-		this.tasked=[];
-		this.waitTask=[];
-		this.failTask=[];
-	},
+		if(item._repeat<util.config.retryCount){
+			this.waitTask.push(item)
+		}else{
+			this.failTask.push(item)
+		}
+
+		this[_isEnd]()
+	}
+
 	// 任务列表是否存zai
 	hasTask(){
 		return this.task.length||this.waitTask.length;
 	}
+	// 爬虫是否完全完成
+	[_isEnd](){
+		let _this=this,
+			pushCount=_this.pushCount,
+			shiftCount=_this.shiftCount,
+			timeout=util.config.timeout;
+		if(shiftCount>=pushCount){
+			let timer=setTimeout(_=>{
+				if(_this.shiftCount>=_this.pushCount){
+					let data={
+							total:_this.pushCount,
+							failTask:_this.failTask
+						}
+					util.emit('end',data)
+				}
+			},timeout);
+			if(_this.timer){
+				clearTimeout(_this.timer);
+			}
+			_this.timer=timer;
+		}
+	}
+	[_init](){
+		util.on(util.config.events.taskPush,data=>{
+			if(this.timer){
+				clearTimeout(this.timer);
+				this.timer=null;
+			}
+			this.pushCount++;
+		});
+	}
 }
+module.exports=new Task();
