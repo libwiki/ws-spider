@@ -164,11 +164,12 @@ class Util{
 		})
 		// 每一次爬取请求 触发的钩子 可以给用户一些交互反馈
 		this.on('send',item=>{
-			//console.log(item.url);
+			console.log(item.url);
 		})
 		// 任务完成监听
 		this.on('end',data=>{
-			let duration=new Date().getTime()-this.startTime;
+			// 500 为task.js中使用的缓冲时间
+			let duration=new Date().getTime()-this.startTime-500;
 			console.log('任务完成...');
 			console.log('总任务数：'+data.total);
 			console.log('失败任务数：'+data.failTask.length);

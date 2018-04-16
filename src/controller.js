@@ -96,8 +96,6 @@ class Controller{
                     charset=item.charset||util.config.charset,
                     myurl=new URL(item.url);
                 let Cookie=_this.cookie[myurl.host]||'';
-                console.log('cookie:',Cookie);
-
                 headers=Object(headers,{Cookie})
                 setTimeout(_=>{
                     util.emit('send',item); // 每次发送请求钩子

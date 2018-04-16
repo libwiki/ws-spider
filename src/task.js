@@ -102,7 +102,7 @@ class Task{
 		let _this=this,
 			pushCount=_this.pushCount,
 			shiftCount=_this.shiftCount,
-			timeout=util.config.timeout;
+			timeout=util.config.timeout+500;
 		if(shiftCount>=pushCount){
 			let timer=setTimeout(_=>{
 				if(_this.shiftCount>=_this.pushCount){

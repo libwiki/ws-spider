@@ -5,7 +5,7 @@ const {util,Controller}=require('../main')
 class Meituan extends Controller{
     constructor(){
         super();
-        this.baseUrl='http://hotel.meituan.com/alashanmeng/';
+        this.baseUrl='http://hotel.meituan.com/nanning/';
         this.cate=[
             {id:1,name:'热门'},
             {id:2,name:'行政区/商圈'},
@@ -24,6 +24,9 @@ class Meituan extends Controller{
             let a=$(row).find('a')[20] //仅获取第20座城市做爬取试验
             let href=$(a).attr('href');
             let text=$(a).text();
+            if(text=='南宁'){
+                console.log('-------------------南宁----------------------');
+            }
             if(text.length&&href.length){
                 let itemData={prefix,name:text,href}
                 let options={callbackName:'positionCate',data:itemData}
@@ -170,10 +173,13 @@ class Meituan extends Controller{
     }
     // 解析详细酒店地址
     hotelParse(self,res,extraData){
-        // 处理无数据页面
-        // 例：http://hotel.meituan.com/jiuquan/ba16130/
-        // 很抱歉,暂时没有找到符合您条件的酒店
         let $=cheerio.load(res.text);
+        if(!$('#list-view div.no-result')){
+            // 处理无数据页面
+            // 例：http://hotel.meituan.com/jiuquan/ba16130/
+            // 很抱歉,暂时没有找到符合您条件的酒店
+            return;
+        }
         let hotelArr=[];
         let poiItem=$('#list-view div.poi-results article.poi-item');
         poiItem.each((index,item)=>{ // 每一个酒店
@@ -182,6 +188,7 @@ class Meituan extends Controller{
             // poiAddress (例：西城区展览馆路3号3楼（地铁6号线车公庄西站D口出向南行200米）)
             //$('#list-view div.poi-results article.poi-item div.column-wrapper div.poi-address').childNodes[1].data.replace(/[\r\n\s*]/g,"")
             //更严谨的应该 遍历比较 nodeName==="#text" || [object Text]
+            //城市ID 未获取到(待处理)
             let data={city_id:extraData.city_id,locations_id:extraData.locations_id}
             let poiTitle=$(item).find('div.info-wrapper .poi-title-wrapper a');
             data.name=poiTitle[0].childNodes[1].data.replace(/[\r\n\s*]/g,"");
