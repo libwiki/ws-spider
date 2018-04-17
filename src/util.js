@@ -74,7 +74,7 @@ class Util{
 				    res.forEach(item=>{
 						let filepath=path.join(dirpath,item),
 							stat=fs.statSync(filepath);
-						if(stat.isFile()&&item.indexOf('.js')>0){
+						if(stat.isDirectory()||(stat.isFile()&&item.indexOf('.js'))>0){
 							modules.push(path.basename(item,'.js'));
 						}
 				    })
@@ -164,12 +164,12 @@ class Util{
 		})
 		// 每一次爬取请求 触发的钩子 可以给用户一些交互反馈
 		this.on('send',item=>{
-			console.log(item.url);
+			//console.log(item.url);
 		})
 		// 任务完成监听
 		this.on('end',data=>{
-			// 500 为task.js中使用的缓冲时间
-			let duration=new Date().getTime()-this.startTime-500;
+			// 1000 为task.js中使用的缓冲时间
+			let duration=new Date().getTime()-this.startTime;
 			console.log('任务完成...');
 			console.log('总任务数：'+data.total);
 			console.log('失败任务数：'+data.failTask.length);

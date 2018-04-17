@@ -76,12 +76,12 @@ class Controller{
 		}
 	}
     // 执行任务
-    [_runTask](isFirst=true){
+    [_runTask](){
         let _this=this,
             length=util.config.limit,
-            limit=isFirst?length*2:1;
+            limit=length*2;
         if(this.tasking.length>=length){
-            return;
+            //return;
         }
         let _task=task.shift(limit)
         _task.forEach(item=>{
@@ -108,7 +108,7 @@ class Controller{
                         }
                         util.emit(util.config.events.parseData,data)
                         // 每完成一个任务则继续补加任务
-                        _this[_runTask](false);
+                        _this[_runTask]();
                         // 该任务完成
                         task.finish(item._index)
                         callback(null,'results');
@@ -117,8 +117,12 @@ class Controller{
                             if(!err.timeout){ //仅捕获非超时错误
                                 util.emit('error',err);
                             }
+                            // console.log(_this.count++);
+                            // console.log('_repeat:',item._repeat);
                             // 本次任务失败 重试
-                            task.setWaitTask(item)
+                            process.nextTick(_=>{
+                                task.setWaitTask(item)
+                            })
                         }
                     })
                 },util.config.speed)

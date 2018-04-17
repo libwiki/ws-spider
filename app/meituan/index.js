@@ -1,7 +1,8 @@
 const cheerio=require('cheerio')
 const fs=require('fs')
-const model=require('../model')
-const {util,Controller}=require('../main')
+const path=require('path')
+const model=require(path.join(process.cwd(),'model'))
+const {util,Controller}=require(path.join(process.cwd(),'main'))
 class Meituan extends Controller{
     constructor(){
         super();

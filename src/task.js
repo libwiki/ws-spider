@@ -18,6 +18,7 @@ class Task{
 		this.timer=null
 		this.pushCount=0
 		this.shiftCount=0
+		this.count=0
 	}
 	// {url,headers,method} 新任务添加
 	push(val){
@@ -51,7 +52,9 @@ class Task{
 		this.shiftCount+=l;
 		if(less>0){
 			let waitTask=this.waitTask.splice(0,less);
+			console.log('_repeat:',newTask.length,less,waitTask.length,this.waitTask.length);
 			newTask.push(...waitTask);
+
 		}
 		newTask=newTask.map(item=>{
 			if(typeof item._repeat==='undefined'){
@@ -102,21 +105,24 @@ class Task{
 		let _this=this,
 			pushCount=_this.pushCount,
 			shiftCount=_this.shiftCount,
-			timeout=util.config.timeout+500;
+			timeout=util.config.timeout+2000;
 		if(shiftCount>=pushCount){
-			let timer=setTimeout(_=>{
+			if(_this.timer){
+				clearTimeout(_this.timer);
+			}
+			_this.timer=setTimeout(_=>{
 				if(_this.shiftCount>=_this.pushCount){
 					let data={
 							total:_this.pushCount,
 							failTask:_this.failTask
-						}
+						};
 					util.emit('end',data)
+					console.log('hasTask:',_this.task.length,_this.waitTask.length,_this.tasked.length,_this.failTask.length);
+					console.log(_this.waitTask[0]);
+				}else{
+					this[_isEnd]()
 				}
 			},timeout);
-			if(_this.timer){
-				clearTimeout(_this.timer);
-			}
-			_this.timer=timer;
 		}
 	}
 	[_init](){
