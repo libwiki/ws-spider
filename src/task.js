@@ -17,7 +17,6 @@ class Task{
 		this.failTask=[] // 失败任务
 		this.timer=null
 		this.pushCount=0
-		this.shiftCount=0
 		this.count=0
 	}
 	// {url,headers,method} 新任务添加
@@ -49,7 +48,6 @@ class Task{
 		let newTask=this.task.splice(0,length);
 		let l=newTask.length;
 		let less=length-l;
-		this.shiftCount+=l;
 		if(less>0){
 			let waitTask=this.waitTask.splice(0,less);
 			console.log('_repeat:',newTask.length,less,waitTask.length,this.waitTask.length,this.count++);
@@ -108,7 +106,7 @@ class Task{
 		let _this=this,
 			taskCount=_this.task.length,
 			total=_this.failTask.length+_this.tasked.length;
-		if(total===this.pushCount||this.pushCount-1===total){
+		if(this.pushCount-1===total){
 			let data={
 					total,
 					failTask:_this.failTask
@@ -120,7 +118,6 @@ class Task{
 	[_init](){
 		util.on(util.config.events.taskPush,data=>{
 			this.pushCount++
-			//console.log(this.pushCount,data._repeat);
 		});
 	}
 }

@@ -1,5 +1,9 @@
-const async=require('async')
+const fs=require('fs')
 const {URL}=require('url')
+const async=require('async')
+// const tough=require('tough-cookie')
+// const Cookie=tough.Cookie
+// const cookiejar=new tough.CookieJar()
 const util=require('./util')
 const task=require('./task')
 const pull=require('./pull')
@@ -10,11 +14,10 @@ const _fetch=Symbol('_fetch')
 const _runTask=Symbol('_runTask')
 class Controller{
     constructor(){
-        this.cookie={}
-        this.tasking=[]
-        this.running=false
-        this[_init]()
-        this.count=0;
+        this.cookie={};
+        this.tasking=[];
+        this.running=false;
+        this[_init]();
     }
     // 创建新的链接请求
     // options={callbackName,data,headers,method,charset}
@@ -46,11 +49,23 @@ class Controller{
 		if(!res)return;
 		callbackName=callbackName||util.config.entryName;
 		if(res.header&&res.request){
-			let cookie=res.header['set-cookie'],
-				host=res.request['host'];
-			if(cookie&&host){
-                this.cookie[host]=cookie;
-			}
+			// let cookie=res.header['set-cookie'],
+			// 	host=res.request['host'];
+			// if(cookie&&host){
+            //     this.cookie[host]=cookie;
+			// }
+			// let cookies=[];
+            // if(res.header['set-cookie'] instanceof Array){
+            //     cookies = res.header['set-cookie'].map(Cookie.parse);
+            // }else{
+            //     cookies = [Cookie.parse(res.headers['set-cookie'])];
+            // }
+            // cookies.map(item=>{
+            //     cookiejar.setCookie(item,res.request.url,err=>{
+            //         if(err)util.emit('error',err);
+            //     })
+            // })
+
 		}
 		self[callbackName](self,res,data);
 	}
@@ -78,22 +93,24 @@ class Controller{
     // 执行任务
     [_runTask](){
         let _this=this,
-            length=util.config.limit,
-            limit=length*2;
+            limit=util.config.limit,
+            delay=util.config.delay;
         let _task=task._shift(limit)
         _this.tasking.push(..._task)
 
         if(_this.tasking.length){
-            let newTask=_this.tasking.splice(0,length);
-            async.mapLimit(newTask,length,(item,callback)=>{
+            let newTask=_this.tasking.splice(0,limit);
+            async.mapLimit(newTask,limit,(item,callback)=>{
+                delay=Math.floor(Math.random()*delay);
                 let headers=item.headers||{},
                     method=item.method||util.config.method,
                     proxy=item.proxy||'',
                     charset=item.charset||util.config.charset,
                     Host=new URL(item.url);
-                let Cookie=_this.cookie[Host]||'';
+                //let Cookie=_this.cookie[Host]||'';
+                //let Cookie=cookiejar.getSetCookieStringsSync(item.url)||'';
                 let options={
-        			headers:Object(headers,{Cookie,Host}),
+        			headers:Object(headers,{Host}),
         			method,
         			proxy,
         			charset
@@ -109,17 +126,18 @@ class Controller{
                         callback(null,'results');
                     }).catch(err=>{
                         if(err){
-                            if(!err.timeout){ //仅捕获非超时错误
+                            if(err.code!=='ESOCKETTIMEDOUT'&&err.code!=='ETIMEDOUT'){
+                                //网络错误和非超时错误不捕获、直接重试
                                 util.emit('error',err);
                             }
                             // 本次任务失败 重试
                             process.nextTick(_=>{
-                                console.log('setWaitTask...',item._repeat,_this.count++);
+                                console.log('setWaitTask...',item._repeat);
                                 task.setWaitTask(item)
                             })
                         }
                     })
-                },util.config.speed)
+                },delay)
             },(err,results)=>{
                 if(err)util.emit('error',err);
             })

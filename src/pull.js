@@ -1,9 +1,6 @@
-const superagent=require('superagent')
-const request=require('superagent-charset')(superagent)
-require('superagent-proxy')(request);
+const request=require('request')
 const util=require('./util')
 const fs=require('fs')
-count=0;
 module.exports={
 	// 远程请求
 	entry(href,options={}){
@@ -16,13 +13,20 @@ module.exports={
 		return new Promise((resolve,reject)=>{
 			//proxy='http://39.134.10.13:8088';
 			let userAgent = util.userAgents[parseInt(Math.random() * util.userAgents.length)]
-			request(options.method,href).set(Object.assign({'User-Agent':userAgent},options.headers))
-			.timeout({response: util.config.timeout, deadline: util.config.timeout})
-			.charset(options.charset)
-			.proxy(options.proxy)
-			.end((err,res)=>{
-				//console.log('entry.......:',count++);
-				if(err)reject(err);
+			let headers=Object.assign({'User-Agent':userAgent},options.headers);
+			request({
+				method:options.method,
+				url:href,
+				headers,
+				encoding:options.charset,
+				jar:true,
+				timeout:util.config.timeout,
+				proxy:options.proxy,
+			},(err,res,body)=>{
+				if(err){
+					//console.log(err.code==='ESOCKETTIMEDOUT');
+					reject(err);
+				}
 				resolve(res);
 			})
 		})

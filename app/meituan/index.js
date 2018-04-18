@@ -19,7 +19,7 @@ class Meituan extends Controller{
     }
     parse(self,res,extraData){
         let _this=this,
-            $=cheerio.load(res.text);
+            $=cheerio.load(res.body);
         $('#search-header-placeholder .city-wrapper .classify-content div:not(.hot-content) .classify-row').each((i,row)=>{
 			let prefix=$(row).children('em').text().toUpperCase();
             let a=$(row).find('a')[20] //仅获取第20座城市做爬取试验
@@ -39,7 +39,7 @@ class Meituan extends Controller{
     positionCate(self,res,extraData){
         let _this=this,
             cates=_this.cate,
-            $=cheerio.load(res.text);
+            $=cheerio.load(res.body);
         let wrap=$('div.search-filter div.search-row-wrap');
         let cate=[];
         cates.forEach((item,index)=>{
@@ -174,7 +174,7 @@ class Meituan extends Controller{
     }
     // 解析详细酒店地址
     hotelParse(self,res,extraData){
-        let $=cheerio.load(res.text);
+        let $=cheerio.load(res.body);
         if(!$('#list-view div.no-result')){
             // 处理无数据页面
             // 例：http://hotel.meituan.com/jiuquan/ba16130/

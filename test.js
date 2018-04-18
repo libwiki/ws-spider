@@ -1,4 +1,5 @@
 const orm=require('orm')
+const request=require('request')
 const async=require('async')
 const model=require('./model')
 const model1=require('./model')
@@ -15,7 +16,7 @@ const pull=require('./src/pull')
 //         console.log(22222);
 //     }
 // })
-let href='http://hotel.meituan.com/yulinyl/ba23807/';
-pull.entry(href).then(rs=>{
-    //console.log(rs);
-})
+for(let i=0;i<=50;i++){
+    let random=Math.floor(Math.random()*2000)+100;
+    console.log(random);
+}
