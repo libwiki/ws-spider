@@ -93,13 +93,14 @@ class Controller{
             async.mapLimit(newTask,length,(item,callback)=>{
                 let headers=item.headers||{},
                     method=item.method||util.config.method,
+                    proxy=item.proxy||'',
                     charset=item.charset||util.config.charset,
-                    myurl=new URL(item.url);
-                let Cookie=_this.cookie[myurl.host]||'';
-                headers=Object(headers,{Cookie})
+                    Host=new URL(item.url);
+                let Cookie=_this.cookie[Host]||'';
+                headers=Object(headers,{Cookie,Host})
                 setTimeout(_=>{
                     util.emit('send',item); // 每次发送请求钩子
-                    pull.entry(item.url,headers,method,charset).then(rs=>{
+                    pull.entry(item.url,headers,method,proxy,charset).then(rs=>{
                         let data={
                             self:item.self,
                             res:rs,
@@ -117,10 +118,9 @@ class Controller{
                             if(!err.timeout){ //仅捕获非超时错误
                                 util.emit('error',err);
                             }
-                            // console.log(_this.count++);
-                            // console.log('_repeat:',item._repeat);
                             // 本次任务失败 重试
                             process.nextTick(_=>{
+                                console.log('setWaitTask...',item._repeat,_this.count++);
                                 task.setWaitTask(item)
                             })
                         }
@@ -171,6 +171,10 @@ class Controller{
 		})
         // 每次新增任务 则触发运行事件
         util.on(util.config.events.taskPush,data=>{
+			this[_runTask]()
+		})
+        // 每次新增重试任务 则触发运行事件
+        util.on(util.config.events.waitTaskPush,data=>{
 			this[_runTask]()
 		})
     }

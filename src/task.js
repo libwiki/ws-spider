@@ -52,7 +52,7 @@ class Task{
 		this.shiftCount+=l;
 		if(less>0){
 			let waitTask=this.waitTask.splice(0,less);
-			console.log('_repeat:',newTask.length,less,waitTask.length,this.waitTask.length);
+			console.log('_repeat:',newTask.length,less,waitTask.length,this.waitTask.length,this.count++);
 			newTask.push(...waitTask);
 
 		}
@@ -75,6 +75,7 @@ class Task{
 		let tasking=this.tasking;
 		if(tasking[index]){
 			if(type){
+				this[_isEnd]()
 				this.tasked.push(tasking[index])
 			}else{
 				this.setWaitTask(tasking[index]);
@@ -89,11 +90,12 @@ class Task{
 		}
 		if(item._repeat<util.config.retryCount){
 			this.waitTask.push(item)
+			util.emit(util.config.events.waitTaskPush,item)
 		}else{
+			this[_isEnd]()
 			this.failTask.push(item)
 		}
 
-		this[_isEnd]()
 	}
 
 	// 任务列表是否存zai
@@ -104,33 +106,23 @@ class Task{
 	[_isEnd](){
 		let _this=this,
 			pushCount=_this.pushCount,
-			shiftCount=_this.shiftCount,
-			timeout=util.config.timeout+2000;
-		if(shiftCount>=pushCount){
-			if(_this.timer){
-				clearTimeout(_this.timer);
-			}
-			_this.timer=setTimeout(_=>{
-				if(_this.shiftCount>=_this.pushCount){
-					let data={
-							total:_this.pushCount,
-							failTask:_this.failTask
-						};
-					util.emit('end',data)
-					console.log('hasTask:',_this.task.length,_this.waitTask.length,_this.tasked.length,_this.failTask.length);
-					console.log(_this.waitTask[0]);
-				}else{
-					this[_isEnd]()
-				}
-			},timeout);
+			total=_this.failTask.length+_this.tasked.length+1;
+			//console.log('totaltotaltotal:',total,pushCount);
+		if(total===pushCount){
+			let data={
+					total,
+					failTask:_this.failTask
+				};
+			util.emit('end',data)
+			console.log('hasTask:',_this.task.length,_this.waitTask.length,_this.tasked.length,_this.failTask.length);
 		}
 	}
 	[_init](){
 		util.on(util.config.events.taskPush,data=>{
-			if(this.timer){
-				clearTimeout(this.timer);
-				this.timer=null;
-			}
+			// if(this.timer){
+			// 	clearTimeout(this.timer);
+			// 	this.timer=null;
+			// }
 			this.pushCount++;
 		});
 	}

@@ -26,6 +26,7 @@
     "mysql": "^2.15.0",
     "orm": "^4.0.2",
     "superagent": "^3.8.2",
-    "superagent-charset": "^1.2.0"
+    "superagent-charset": "^1.2.0",
+    "superagent-proxy": "^1.0.3"
   }
 }

@@ -11,7 +11,8 @@ module.exports={
 	method:'get',
 	charset:'utf-8',
 	events:{
-		taskPush:'ws-tash-push', // 新增task事件
+		taskPush:'ws-task-push', // 新增task事件
+		waitTaskPush:'ws-wait-task-push', //重试任务
 		updateCookie:'ws-cookie', // cookie 更新
 		newTask:'ws-new-task', // 用户创建新任务 事件
 		parseData:'ws-parse-data',// 数据返回解析cookie事件
