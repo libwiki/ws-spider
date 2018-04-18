@@ -3,18 +3,26 @@ const request=require('superagent-charset')(superagent)
 require('superagent-proxy')(request);
 const util=require('./util')
 const fs=require('fs')
-
+count=0;
 module.exports={
 	// 远程请求
-	entry(href,headers={},method='get',proxy='',charset='utf-8'){
+	entry(href,options={}){
+		options=Object.assign({
+			headers:{},
+			item:{},
+			method:'get',
+			proxy:'',
+			charset:'utf-8'
+		},options);
 		return new Promise((resolve,reject)=>{
-			//proxy='http://112.245.192.99:61234';
+			//proxy='http://39.134.10.13:8088';
 			let userAgent = util.userAgents[parseInt(Math.random() * util.userAgents.length)]
-			request(method,href).set(Object.assign({'User-Agent':userAgent},headers))
+			request(options.method,href).set(Object.assign({'User-Agent':userAgent},options.headers))
 			.timeout({response: util.config.timeout, deadline: util.config.timeout})
-			.charset(charset)
-			.proxy(proxy)
+			.charset(options.charset)
+			.proxy(options.proxy)
 			.end((err,res)=>{
+				//console.log('entry.......:',count++);
 				if(err)reject(err);
 				resolve(res);
 			})

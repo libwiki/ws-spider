@@ -22,7 +22,7 @@ class Meituan extends Controller{
             $=cheerio.load(res.text);
         $('#search-header-placeholder .city-wrapper .classify-content div:not(.hot-content) .classify-row').each((i,row)=>{
 			let prefix=$(row).children('em').text().toUpperCase();
-            let a=$(row).find('a')[10] //仅获取第10座城市做爬取试验
+            let a=$(row).find('a')[20] //仅获取第20座城市做爬取试验
             let href=$(a).attr('href');
             let text=$(a).text();
             if(text=='南宁'){

@@ -42,7 +42,7 @@ class Task{
 
 	}
 	//获取执行任务
-	shift(length=1){
+	_shift(length=1){
 		if(length<1||!this.hasTask()){
 			return [];
 		}
@@ -90,9 +90,11 @@ class Task{
 		}
 		if(item._repeat<util.config.retryCount){
 			this.waitTask.push(item)
+			console.log('setWaitTask.........');
 			util.emit(util.config.events.waitTaskPush,item)
 		}else{
 			this[_isEnd]()
+			console.log(item.url);
 			this.failTask.push(item)
 		}
 
@@ -105,10 +107,9 @@ class Task{
 	// 爬虫是否完全完成
 	[_isEnd](){
 		let _this=this,
-			pushCount=_this.pushCount,
-			total=_this.failTask.length+_this.tasked.length+1;
-			//console.log('totaltotaltotal:',total,pushCount);
-		if(total===pushCount){
+			taskCount=_this.task.length,
+			total=_this.failTask.length+_this.tasked.length;
+		if(total===this.pushCount||this.pushCount-1===total){
 			let data={
 					total,
 					failTask:_this.failTask
@@ -123,7 +124,8 @@ class Task{
 			// 	clearTimeout(this.timer);
 			// 	this.timer=null;
 			// }
-			this.pushCount++;
+			this.pushCount++
+			//console.log(this.pushCount,data._repeat);
 		});
 	}
 }

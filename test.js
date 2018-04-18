@@ -2,6 +2,7 @@ const orm=require('orm')
 const async=require('async')
 const model=require('./model')
 const model1=require('./model')
+const pull=require('./src/pull')
 
 // model.db('area',db=>{
 //     console.log(123);
@@ -14,3 +15,7 @@ const model1=require('./model')
 //         console.log(22222);
 //     }
 // })
+let href='http://hotel.meituan.com/yulinyl/ba23807/';
+pull.entry(href).then(rs=>{
+    //console.log(rs);
+})

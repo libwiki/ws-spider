@@ -13,6 +13,7 @@ class Util{
 		this.userAgents=userAgents
 		this.startTime=0;
 		this[_init]();
+		this.count=0
 	}
 	run(val=1){
 		if(this.startTime===0){
@@ -164,6 +165,7 @@ class Util{
 		})
 		// 每一次爬取请求 触发的钩子 可以给用户一些交互反馈
 		this.on('send',item=>{
+			//console.log('send',this.count++);
 			//console.log(item.url);
 		})
 		// 任务完成监听

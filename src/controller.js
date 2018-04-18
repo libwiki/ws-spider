@@ -80,15 +80,10 @@ class Controller{
         let _this=this,
             length=util.config.limit,
             limit=length*2;
-        if(this.tasking.length>=length){
-            //return;
-        }
-        let _task=task.shift(limit)
-        _task.forEach(item=>{
-            _this.tasking.push(item);
-        })
-        if(!_this.running&&_this.tasking.length){
-            _this.running=true;
+        let _task=task._shift(limit)
+        _this.tasking.push(..._task)
+
+        if(_this.tasking.length){
             let newTask=_this.tasking.splice(0,length);
             async.mapLimit(newTask,length,(item,callback)=>{
                 let headers=item.headers||{},
@@ -97,10 +92,16 @@ class Controller{
                     charset=item.charset||util.config.charset,
                     Host=new URL(item.url);
                 let Cookie=_this.cookie[Host]||'';
-                headers=Object(headers,{Cookie,Host})
+                let options={
+        			headers:Object(headers,{Cookie,Host}),
+        			item,
+        			method,
+        			proxy,
+        			charset
+        		};
                 setTimeout(_=>{
                     util.emit('send',item); // 每次发送请求钩子
-                    pull.entry(item.url,headers,method,proxy,charset).then(rs=>{
+                    pull.entry(item.url,options).then(rs=>{
                         let data={
                             self:item.self,
                             res:rs,
@@ -129,8 +130,6 @@ class Controller{
             },(err,results)=>{
                 if(err)util.emit('error',err);
             })
-        }else{
-            _this.running=false;
         }
     }
     // 事件监听

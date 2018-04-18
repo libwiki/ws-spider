@@ -5,8 +5,8 @@ module.exports={
 	limit:3, // 并发量
 	delay:2000, //延迟(取该值以内的一个随机数) 单位：ms
 	debug:true,
-	timeout:3000, //超时 单位：ms
-	speed:1000, // 限速 单位：ms
+	timeout:2000, //超时 单位：ms
+	speed:2000, // 限速 单位：ms
 	retryCount:3, // 重试次数
 	method:'get',
 	charset:'utf-8',
