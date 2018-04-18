@@ -90,7 +90,6 @@ class Task{
 		}
 		if(item._repeat<util.config.retryCount){
 			this.waitTask.push(item)
-			console.log('setWaitTask.........');
 			util.emit(util.config.events.waitTaskPush,item)
 		}else{
 			this[_isEnd]()
@@ -120,10 +119,6 @@ class Task{
 	}
 	[_init](){
 		util.on(util.config.events.taskPush,data=>{
-			// if(this.timer){
-			// 	clearTimeout(this.timer);
-			// 	this.timer=null;
-			// }
 			this.pushCount++
 			//console.log(this.pushCount,data._repeat);
 		});

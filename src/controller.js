@@ -49,7 +49,7 @@ class Controller{
 			let cookie=res.header['set-cookie'],
 				host=res.request['host'];
 			if(cookie&&host){
-				util.emit(util.config.events.updateCookie,{host,cookie})
+                this.cookie[host]=cookie;
 			}
 		}
 		self[callbackName](self,res,data);
@@ -64,7 +64,7 @@ class Controller{
 				url:m[baseUrlName],
 				self:m
 			}
-			util.emit(util.config.events.newTask,data);
+            this.create(m,m[baseUrlName]);
 		}else{
 			util.emit('error',`请先设置起始链接：`.baseUrlName);
 			return;
@@ -94,21 +94,14 @@ class Controller{
                 let Cookie=_this.cookie[Host]||'';
                 let options={
         			headers:Object(headers,{Cookie,Host}),
-        			item,
         			method,
         			proxy,
         			charset
         		};
                 setTimeout(_=>{
                     util.emit('send',item); // 每次发送请求钩子
-                    pull.entry(item.url,options).then(rs=>{
-                        let data={
-                            self:item.self,
-                            res:rs,
-                            callbackName:item.callbackName,
-                            data:item.data
-                        }
-                        util.emit(util.config.events.parseData,data)
+                    pull.entry(item.url,options).then(res=>{
+                        _this[_inject](item.self,res,item.callbackName,item.data)
                         // 每完成一个任务则继续补加任务
                         _this[_runTask]();
                         // 该任务完成
@@ -134,36 +127,6 @@ class Controller{
     }
     // 事件监听
     [_init](){
-        // 用户创建新的链接请求
-		util.on(util.config.events.newTask,(err,data)=>{
-			if(err){
-				util.emit('error',err)
-			}
-			if(!data||!data.url||!data.self){
-				return;
-			}
-            let options={
-                callbackName:data.callbackName,
-                data:data.data,
-                headers:data.headers
-            }
-            this.create(data.self,data.url,options);
-		})
-
-        // 用户结果数据注入
-		util.on(util.config.events.parseData,(err,data)=>{
-			if(err){
-				util.emit('error',err)
-			}
-			this[_inject](data.self,data.res,data.callbackName,data.data)
-		})
-        // cookie 更新
-		util.on(util.config.events.updateCookie,data=>{
-			if(!data||!data.host||!data.cookie){
-				return;
-			}
-			this.cookie[data.host]=data.cookie;
-		})
         // 初始化、首次执行解析器
 		util.on(util.config.events._fetch,data=>{
 			this[_fetch](data)

@@ -9,7 +9,6 @@ module.exports={
 	entry(href,options={}){
 		options=Object.assign({
 			headers:{},
-			item:{},
 			method:'get',
 			proxy:'',
 			charset:'utf-8'

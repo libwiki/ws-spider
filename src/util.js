@@ -170,7 +170,6 @@ class Util{
 		})
 		// 任务完成监听
 		this.on('end',data=>{
-			// 1000 为task.js中使用的缓冲时间
 			let duration=new Date().getTime()-this.startTime;
 			console.log('任务完成...');
 			console.log('总任务数：'+data.total);
