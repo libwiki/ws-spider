@@ -22,21 +22,30 @@ class Meituan extends Controller{
             $=cheerio.load(res.body);
         $('#search-header-placeholder .city-wrapper .classify-content div:not(.hot-content) .classify-row').each((i,row)=>{
 			let prefix=$(row).children('em').text().toUpperCase();
-            let a=$(row).find('a')[20] //仅获取第20座城市做爬取试验
-            let href=$(a).attr('href');
-            let text=$(a).text();
-            if(text=='南宁'){
-                console.log('-------------------南宁----------------------');
-            }
-            if(text.length&&href.length){
+            // let a=$(row).find('a')[20] 
+            // let href=$(a).attr('href');
+            // let text=$(a).text();
+            // if(text=='南宁'){
+            //     console.log('-------------------南宁----------------------');
+            // }
+            $(row).find('a').each((index,ele)=>{
+                let href=$(ele).attr('href');
+                let text=$(ele).text();
+                
                 let itemData={prefix,name:text,href}
                 let options={callbackName:'positionCate',data:itemData}
+                // 仅获取 '南宁' 做爬取试验
+                if(text==='南宁'){
+                    console.log('-------------------南宁----------------------');
+                }
                 super.create(_this,href,options)
-            }
+            })
+            
 		})
     }
     // 位置分类（热门、行政区、地铁站、高校......）
     positionCate(self,res,extraData){
+        console.log('positionCate',extraData)
         let _this=this,
             cates=_this.cate,
             $=cheerio.load(res.body);
@@ -86,7 +95,8 @@ class Meituan extends Controller{
                         classify.forEach(classifyItem=>{
                             model.db('area',db=>{
                                 db.create({
-                                    name:classifyItem.name
+                                    name:classifyItem.name,
+                                    city_id:city.id
                                 },(err,area)=>{
                                     if(err)util.emit('error',err);
                                     if(area&&area.id){
@@ -95,6 +105,7 @@ class Meituan extends Controller{
                                             db.create({
                                                 classify_id:item.id,
                                                 area_id:area.id,
+                                                city_id:city.id
                                             },(err,area)=>{
                                                 if(err)util.emit('error',err);
                                             })

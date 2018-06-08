@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50553
 File Encoding         : 65001
 
-Date: 2018-04-13 08:50:16
+Date: 2018-06-08 10:16:39
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -22,6 +22,7 @@ DROP TABLE IF EXISTS `t_area`;
 CREATE TABLE `t_area` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL COMMENT '区域、分类名称标签',
+  `city_id` int(11) DEFAULT '0' COMMENT '城市ID'
   `status` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -36,7 +37,8 @@ CREATE TABLE `t_area` (
 DROP TABLE IF EXISTS `t_area_classify`;
 CREATE TABLE `t_area_classify` (
   `classify_id` int(11) DEFAULT '0' COMMENT '每一个区域的统计分类ID 来源表：classify',
-  `area_id` int(11) DEFAULT '0' COMMENT '城市区域ID 来源表：area'
+  `area_id` int(11) DEFAULT '0' COMMENT '城市区域ID 来源表：area',
+  `city_id` int(11) DEFAULT '0' COMMENT '城市ID'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------

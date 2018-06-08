@@ -9,5 +9,6 @@ module.exports=function(orm,db,name){
         l_and_l:String,
         locations_id:{type:'integer',defaultValue:0},
         status:{type:'integer',defaultValue:1},
+        city_id:Number,
     })
 }

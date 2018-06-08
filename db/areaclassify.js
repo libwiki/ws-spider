@@ -4,5 +4,6 @@ module.exports=function(orm,db,name){
     db.define(name,{
         classify_id:Number,
         area_id:Number,
+        city_id:Number,
     })
 }
